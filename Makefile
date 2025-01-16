@@ -1,35 +1,40 @@
-all: boot.bin
+all: clean boot.bin
 
 bochs:
 	bochs -f bochsrc.txt -q
 
-qemu_gdb: clean boot.bin
-	qemu-system-i386 -s -S mbr.bin
+qemu_gdb: image
+	qemu-system-i386 -s -S build/boot.img
 
-qemu: clean boot.bin
-	qemu-system-i386.exe mbr.bin
+qemu: image
+	qemu-system-i386 build/boot.img
+
+image: clean boot.bin
+	dd if=build/mbr.bin of=build/boot.img
+	dd seek=1 if=build/stage2.bin of=build/boot.img
 
 boot.bin: mbr.bin stage2.bin
 boot: mbr stage2
 boot.o: mbr.o stage2.o
 
 stage2.bin: stage2
-	objcopy -O binary stage2 stage2.bin
+	objcopy -O binary build/stage2 build/stage2.bin
 
 mbr.bin: mbr
-	objcopy -O binary mbr mbr.bin
+	objcopy -O binary build/mbr build/mbr.bin
 
 stage2: stage2.o
-	ld -Tboot.ld -o stage2 stage2.o
+	ld -Tboot.ld -o build/stage2 build/stage2.o
 
 mbr: mbr.o
-	ld -Tboot.ld -o mbr mbr.o
+	ld -Tboot.ld -o build/mbr build/mbr.o
 
 stage2.o:
-	as -o stage2.o stage2.asm
+	as -o build/stage2.o stage2.asm
 
 mbr.o:
-	as -o mbr.o mbr.asm
+	mkdir build/
+	as -o build/mbr.o mbr.asm
 
 clean:
-	rm mbr.o mbr.bin mbr stage2.o stage2.bin stage2
+	rm -rvf build/
