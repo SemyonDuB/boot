@@ -1,2 +1,2 @@
-# MyBootloader
-Simple bootloader
+# boot
+This is my simple bootloader implementation
