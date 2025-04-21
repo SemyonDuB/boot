@@ -36,6 +36,9 @@ _start:
 
 	mov $0x7E00, %bx
     int $0x13
+
+    mov $0x7E00, %ax
+    jmp %ax
 	
     nop
     hlt

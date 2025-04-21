@@ -10,8 +10,10 @@ qemu: image
 	qemu-system-i386 build/boot.img
 
 image: clean boot.bin
-	dd if=build/mbr.bin of=build/boot.img
-	dd seek=1 if=build/stage2.bin of=build/boot.img
+	dd if=/dev/zero of=build/boot.img bs=5M count=1
+	mformat -i build/boot.img ::
+	dd if=build/mbr.bin of=build/boot.img bs=446 count=1 conv=notrunc
+	dd seek=1 if=build/stage2.bin of=build/boot.img conv=notrunc
 
 boot.bin: mbr.bin stage2.bin
 boot: mbr stage2
@@ -24,7 +26,7 @@ mbr.bin: mbr
 	objcopy -O binary build/mbr build/mbr.bin
 
 stage2: stage2.o
-	ld -Tboot.ld -o build/stage2 build/stage2.o
+	ld -Tstage2.ld -o build/stage2 build/stage2.o
 
 mbr: mbr.o
 	ld -Tboot.ld -o build/mbr build/mbr.o
