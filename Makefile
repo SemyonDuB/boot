@@ -11,7 +11,10 @@ qemu: image
 
 image: clean boot.bin
 	dd if=/dev/zero of=build/boot.img bs=5M count=1
-	mformat -i build/boot.img ::
+	
+	mformat -i build/boot.img@@2s ::
+	mcopy -i build/boot.img@@2s kernel.txt ::
+	
 	dd if=build/mbr.bin of=build/boot.img bs=446 count=1 conv=notrunc
 	dd seek=1 if=build/stage2.bin of=build/boot.img conv=notrunc
 
